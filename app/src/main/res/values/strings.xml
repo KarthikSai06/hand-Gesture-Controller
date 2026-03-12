@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GestureControl</string>
+    <string name="accessibility_service_label">GestureControl Service</string>
+    <string name="accessibility_service_description">Enables GestureControl to inject system-wide gestures (double-tap, swipe) based on hand gestures detected by the front camera.</string>
+    <string name="notification_channel_name">GestureControl</string>
+    <string name="notification_title">GestureControl Active</string>
+    <string name="notification_text">Gesture detection is running</string>
+    <string name="stop_service">Stop</string>
+</resources>
