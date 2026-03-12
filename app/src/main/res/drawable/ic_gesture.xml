@@ -5,17 +5,14 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Rounded Square Background mimicking the icon style -->
     <path
         android:fillColor="#0D1424"
         android:pathData="M24,4h60c11.05,0 20,8.95 20,20v60c0,11.05 -8.95,20 -20,20h-60c-11.05,0 -20,-8.95 -20,-20v-60c0,-11.05 8.95,-20 20,-20z" />
 
-    <!-- Inner Glow effect -->
     <path
         android:fillColor="#1A00E5FF"
         android:pathData="M54,54m-42,0a42,42 0,1 1,84 0a42,42 0,1 1,-84 0" />
 
-    <!-- Smartphone Outline -->
     <path
         android:strokeColor="#00E5FF"
         android:strokeWidth="3"
@@ -23,7 +20,6 @@
         android:strokeLineJoin="round"
         android:pathData="M38,24h32c2.2,0 4,1.8 4,4v52c0,2.2 -1.8,4 -4,4H38c-2.2,0 -4,-1.8 -4,-4v-52c0,-2.2 1.8,-4 4,-4z" />
 
-    <!-- Screen Gesture Ripples -->
     <path
         android:strokeColor="#00E5FF"
         android:strokeWidth="2"
@@ -35,7 +31,6 @@
         android:strokeLineCap="round"
         android:pathData="M86,34c5,6 7,12 7,20s-2,14 -7,20" />
 
-    <!-- Hand with pointing finger -->
     <path
         android:fillColor="#FFFFFF"
         android:strokeColor="#00E5FF"

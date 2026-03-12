@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeScreen() {
     val context = LocalContext.current
 
-    // Permission states (re-checked every second)
     var hasCam by remember { mutableStateOf(false) }
     var hasA11y by remember { mutableStateOf(false) }
     var hasNotif by remember { mutableStateOf(false) }
@@ -80,7 +79,6 @@ fun HomeScreen() {
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Header
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -112,7 +110,6 @@ fun HomeScreen() {
                 }
             }
 
-            // Live status badge
             AnimatedContent(targetState = lastResult.gestureName, label = "badge") { name ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -146,7 +143,6 @@ fun HomeScreen() {
                 }
             }
 
-            // Permission cards
             Text("Permissions", color = TextSecondary,
                 style = MaterialTheme.typography.labelLarge)
             PermissionCard("Camera", "Required for gesture detection", Icons.Default.CameraAlt, hasCam) {
@@ -168,7 +164,6 @@ fun HomeScreen() {
                 }
             }
 
-            // Service toggle
             Spacer(Modifier.height(4.dp))
             ServiceToggleButton(serviceRunning, allGranted = hasCam && hasA11y) {
                 val svcIntent = Intent(context, CameraForegroundService::class.java)
@@ -180,7 +175,6 @@ fun HomeScreen() {
                 }
             }
 
-            // Gesture guide
             Text("Gesture Map", color = TextSecondary, style = MaterialTheme.typography.labelLarge)
             GestureGuideCard("👍", "Thumbs Up", "Double Tap", "Tap twice at screen center")
             GestureGuideCard("☝️", "Pointing Up", "Swipe Up", "Swipe from bottom to top")

@@ -47,7 +47,6 @@ class GestureRecognizerHelper(
 
             gestureRecognizer = GestureRecognizer.createFromOptions(context, options)
         } catch (e: Exception) {
-            Log.e(TAG, "Setup failed: ${e.message}")
             onError(e)
         }
     }
@@ -58,15 +57,11 @@ class GestureRecognizerHelper(
             imageProxy.width, imageProxy.height, Bitmap.Config.ARGB_8888
         )
         
-        // Copy pixel data
         imageProxy.planes[0].buffer.rewind()
         bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
         
-        // Setup rotation matrix
         val matrix = Matrix().apply {
-            // 1. Rotate to match screen orientation
             postRotate(rotationDegrees.toFloat())
-            // 2. Mirror horizontally for front camera (flip across Y axis)
             postScale(-1f, 1f)
         }
 

@@ -19,7 +19,6 @@ class GestureAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
-        Log.d(TAG, "Accessibility service connected")
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
@@ -44,24 +43,13 @@ class GestureAccessibilityService : AccessibilityService() {
     private fun doDoubleTap(x: Float, y: Float) {
         val p = Path().apply { moveTo(x, y) }
         val tap1 = GestureDescription.StrokeDescription(p, 0L, 50L)
-        
-        // Restore the 150ms delay between taps as requested
         val tap2 = GestureDescription.StrokeDescription(p, 150L, 50L)
         
         val gestureBuilder = GestureDescription.Builder()
         gestureBuilder.addStroke(tap1)
         gestureBuilder.addStroke(tap2)
         
-        dispatchGesture(gestureBuilder.build(), object : GestureResultCallback() {
-            override fun onCompleted(gestureDescription: GestureDescription?) {
-                super.onCompleted(gestureDescription)
-                Log.d(TAG, "Double tap gesture completed")
-            }
-            override fun onCancelled(gestureDescription: GestureDescription?) {
-                super.onCancelled(gestureDescription)
-                Log.d(TAG, "Double tap gesture cancelled")
-            }
-        }, null)
+        dispatchGesture(gestureBuilder.build(), null, null)
     }
 
     private fun doSwipe(sx: Float, sy: Float, ex: Float, ey: Float) {
