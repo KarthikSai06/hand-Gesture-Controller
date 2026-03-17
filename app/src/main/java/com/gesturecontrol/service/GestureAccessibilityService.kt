@@ -2,7 +2,9 @@ package com.gesturecontrol.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.content.Context
 import android.graphics.Path
+import android.media.AudioManager
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 
@@ -12,8 +14,16 @@ class GestureAccessibilityService : AccessibilityService() {
         var instance: GestureAccessibilityService? = null
         private const val TAG = "GestureA11y"
 
-        const val ACTION_DOUBLE_TAP = "DOUBLE_TAP"
-        const val ACTION_SWIPE_UP = "SWIPE_UP"
+        const val ACTION_DOUBLE_TAP  = "DOUBLE_TAP"
+        const val ACTION_SWIPE_UP    = "SWIPE_UP"
+        const val ACTION_SWIPE_DOWN  = "SWIPE_DOWN"
+        const val ACTION_VOLUME_UP   = "VOLUME_UP"
+        const val ACTION_VOLUME_DOWN = "VOLUME_DOWN"
+        const val ACTION_BACK        = "BACK"
+        const val ACTION_HOME        = "HOME"
+        const val ACTION_RECENTS     = "RECENTS"
+        const val ACTION_SCROLL_UP   = "SCROLL_UP"
+        const val ACTION_SCROLL_DOWN = "SCROLL_DOWN"
     }
 
     override fun onServiceConnected() {
@@ -35,9 +45,26 @@ class GestureAccessibilityService : AccessibilityService() {
         val cy = dm.heightPixels / 2f
 
         when (action) {
-            ACTION_DOUBLE_TAP -> doDoubleTap(cx, cy)
-            ACTION_SWIPE_UP   -> doSwipe(cx, dm.heightPixels * 0.75f, cx, dm.heightPixels * 0.20f)
+            ACTION_DOUBLE_TAP  -> doDoubleTap(cx, cy)
+            ACTION_SWIPE_UP    -> doSwipe(cx, dm.heightPixels * 0.75f, cx, dm.heightPixels * 0.20f)
+            ACTION_SWIPE_DOWN  -> doSwipe(cx, dm.heightPixels * 0.20f, cx, dm.heightPixels * 0.75f)
+            ACTION_SCROLL_UP   -> doSwipe(cx, cy + 300f, cx, cy - 300f)
+            ACTION_SCROLL_DOWN -> doSwipe(cx, cy - 300f, cx, cy + 300f)
+            ACTION_BACK        -> performGlobalAction(GLOBAL_ACTION_BACK)
+            ACTION_HOME        -> performGlobalAction(GLOBAL_ACTION_HOME)
+            ACTION_RECENTS     -> performGlobalAction(GLOBAL_ACTION_RECENTS)
+            ACTION_VOLUME_UP   -> adjustVolume(AudioManager.ADJUST_RAISE)
+            ACTION_VOLUME_DOWN -> adjustVolume(AudioManager.ADJUST_LOWER)
         }
+    }
+
+    private fun adjustVolume(direction: Int) {
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audio.adjustStreamVolume(
+            AudioManager.STREAM_MUSIC,
+            direction,
+            AudioManager.FLAG_SHOW_UI
+        )
     }
 
     private fun doDoubleTap(x: Float, y: Float) {

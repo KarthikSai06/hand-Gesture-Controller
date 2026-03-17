@@ -7,4 +7,11 @@
     <string name="notification_title">GestureControl Active</string>
     <string name="notification_text">Gesture detection is running</string>
     <string name="stop_service">Stop</string>
+    <!-- Gesture Recorder -->
+    <string name="nav_record">Record</string>
+    <string name="record_title">Gesture Recorder</string>
+    <string name="record_subtitle">Collect training data • Export to CSV</string>
+    <string name="record_export_success">CSV saved to Downloads</string>
+    <string name="record_export_fail">Export failed — check storage access</string>
 </resources>
+

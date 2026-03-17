@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.SystemClock
 import androidx.camera.core.ImageProxy
+import com.gesturecontrol.GestureEventBus
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -15,7 +16,9 @@ import android.util.Log
 class GestureRecognizerHelper(
     private val context: Context,
     private val onResult: (String, Float) -> Unit,
-    private val onError: (Exception) -> Unit
+    private val onError: (Exception) -> Unit,
+    /** Called on every inference frame with the 21 hand landmarks (empty list = no hand). */
+    private val onLandmarks: (List<GestureEventBus.Landmark>) -> Unit = {}
 ) {
     private var gestureRecognizer: GestureRecognizer? = null
 
@@ -56,10 +59,10 @@ class GestureRecognizerHelper(
         val bitmapBuffer = Bitmap.createBitmap(
             imageProxy.width, imageProxy.height, Bitmap.Config.ARGB_8888
         )
-        
+
         imageProxy.planes[0].buffer.rewind()
         bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
-        
+
         val matrix = Matrix().apply {
             postRotate(rotationDegrees.toFloat())
             postScale(-1f, 1f)
@@ -68,7 +71,7 @@ class GestureRecognizerHelper(
         val rotatedBitmap = Bitmap.createBitmap(
             bitmapBuffer, 0, 0, bitmapBuffer.width, bitmapBuffer.height, matrix, false
         )
-        
+
         imageProxy.close()
 
         val mpImage = BitmapImageBuilder(rotatedBitmap).build()
@@ -76,6 +79,15 @@ class GestureRecognizerHelper(
     }
 
     private fun handleResult(result: GestureRecognizerResult) {
+        // Extract the 21 landmarks for the first detected hand.
+        val landmarks: List<GestureEventBus.Landmark> = if (result.landmarks().isNotEmpty()) {
+            result.landmarks()[0].map { lm ->
+                GestureEventBus.Landmark(lm.x(), lm.y(), lm.z())
+            }
+        } else emptyList()
+
+        onLandmarks(landmarks)
+
         if (result.gestures().isEmpty() || result.gestures()[0].isEmpty()) {
             onResult("None", 0f)
             return

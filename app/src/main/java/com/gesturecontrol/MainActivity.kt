@@ -11,6 +11,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
@@ -26,6 +28,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.gesturecontrol.GestureActionMap
+import com.gesturecontrol.ui.screens.GestureActionMappingScreen
+import com.gesturecontrol.ui.screens.GestureRecorderScreen
 import com.gesturecontrol.ui.screens.HomeScreen
 import com.gesturecontrol.ui.screens.SettingsScreen
 import com.gesturecontrol.ui.screens.TestScreen
@@ -41,6 +46,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = android.graphics.Color.TRANSPARENT
+
+        GestureActionMap.init(this)
 
         val perms = mutableListOf(Manifest.permission.CAMERA)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -59,6 +66,8 @@ class MainActivity : ComponentActivity() {
 sealed class Screen(val route: String, val label: String) {
     object Home     : Screen("home",     "Home")
     object Test     : Screen("test",     "Test")
+    object Record   : Screen("record",   "Record")
+    object Mapping  : Screen("mapping",  "Actions")
     object Settings : Screen("settings", "Settings")
 }
 
@@ -68,10 +77,12 @@ fun GestureControlApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val items = listOf(Screen.Home, Screen.Test, Screen.Settings)
+    val items = listOf(Screen.Home, Screen.Test, Screen.Record, Screen.Mapping, Screen.Settings)
     val icons = mapOf(
         Screen.Home     to Icons.Default.Home,
         Screen.Test     to Icons.Default.Visibility,
+        Screen.Record   to Icons.Default.FitnessCenter,
+        Screen.Mapping  to Icons.Default.Gamepad,
         Screen.Settings to Icons.Default.Settings
     )
 
@@ -129,6 +140,8 @@ fun GestureControlApp() {
         ) {
             composable(Screen.Home.route)     { HomeScreen() }
             composable(Screen.Test.route)     { TestScreen() }
+            composable(Screen.Record.route)   { GestureRecorderScreen() }
+            composable(Screen.Mapping.route)  { GestureActionMappingScreen() }
             composable(Screen.Settings.route) { SettingsScreen() }
         }
     }

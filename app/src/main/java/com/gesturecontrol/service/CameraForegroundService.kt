@@ -12,22 +12,28 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
+import com.gesturecontrol.GestureActionMap
 import com.gesturecontrol.GestureEventBus
 import com.gesturecontrol.GestureSettings
 import com.gesturecontrol.MainActivity
 import com.gesturecontrol.R
+import com.gesturecontrol.recognition.BuiltInGestureLibrary
+import com.gesturecontrol.recognition.CustomGestureClassifier
 import com.gesturecontrol.recognition.GestureRecognizerHelper
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.Executors
 
 class CameraForegroundService : LifecycleService() {
 
     private lateinit var cameraExecutor: ExecutorService
     private var gestureRecognizerHelper: GestureRecognizerHelper? = null
+    private var customClassifier: CustomGestureClassifier? = null
     private var preview: Preview? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var lastActioned = "None"
     private var lastActionTime = 0L
+    private val latestLandmarks = AtomicReference<List<GestureEventBus.Landmark>>(emptyList())
 
     companion object {
         const val CHANNEL_ID = "gesture_ctrl_channel"
@@ -52,6 +58,11 @@ class CameraForegroundService : LifecycleService() {
         instance = this
         cameraExecutor = Executors.newSingleThreadExecutor()
         createNotificationChannel()
+        // Load custom TFLite classifier (no-op if model files aren't in assets yet)
+        customClassifier = CustomGestureClassifier(this)
+        if (customClassifier!!.isAvailable) {
+            Log.i(TAG, "Custom gesture classifier active")
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -64,16 +75,19 @@ class CameraForegroundService : LifecycleService() {
         setupGestureRecognizer()
         bindCamera()
         isRunning = true
+        GestureQuickTileService.requestTileUpdate(this)
         return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
         gestureRecognizerHelper?.close()
+        customClassifier?.close()
         cameraProvider?.unbindAll()
         cameraExecutor.shutdown()
         isRunning = false
         instance = null
+        GestureQuickTileService.requestTileUpdate(this)
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -113,7 +127,8 @@ class CameraForegroundService : LifecycleService() {
         gestureRecognizerHelper = GestureRecognizerHelper(
             context = this,
             onResult = ::handleGestureResult,
-            onError = { Log.e(TAG, "Gesture error: ${it.message}") }
+            onError = { Log.e(TAG, "Gesture error: ${it.message}") },
+            onLandmarks = { latestLandmarks.set(it) }
         )
     }
 
@@ -121,29 +136,49 @@ class CameraForegroundService : LifecycleService() {
         val threshold = GestureSettings.confidenceThreshold
         val now = System.currentTimeMillis()
         val cooldown = GestureSettings.actionCooldownMs
+        val lms = latestLandmarks.get()
 
+        // ── Custom TFLite classifier ──────────────────────────────────────────
+        val customResult = if (lms.size == 21 && gestureName == "None")
+                               customClassifier?.predict(lms)
+                           else null
+
+        // ── Built-in geometry library (runs when MediaPipe+TFLite both return None) ─
+        val builtInResult = if (lms.size == 21 && gestureName == "None" && customResult == null)
+                                BuiltInGestureLibrary.classify(lms)
+                            else null
+
+        // Resolve final gesture + confidence
+        val finalGesture    = customResult?.first  ?: builtInResult?.first  ?: gestureName
+        val finalConfidence = customResult?.second ?: builtInResult?.second ?: confidence
+
+        // ── Action lookup via GestureActionMap ───────────────────────────────
         val action: String? = when {
-            gestureName == "Thumb_Up" && GestureSettings.thumbsUpEnabled && confidence >= threshold ->
-                GestureAccessibilityService.ACTION_DOUBLE_TAP
-            gestureName == "Pointing_Up" && GestureSettings.pointingUpEnabled && confidence >= threshold ->
-                GestureAccessibilityService.ACTION_SWIPE_UP
-            else -> null
+            finalGesture == "None"             -> null
+            finalConfidence < threshold        -> null
+            else -> {
+                val mapped = GestureActionMap.getAction(finalGesture)
+                if (mapped == GestureActionMap.ACTION_NONE) null else mapped
+            }
         }
 
-        val triggered = if (action != null && (now - lastActionTime) > cooldown && gestureName != lastActioned) {
+        val triggered = if (action != null
+                && (now - lastActionTime) > cooldown
+                && finalGesture != lastActioned) {
             lastActionTime = now
-            lastActioned = gestureName
+            lastActioned = finalGesture
             GestureAccessibilityService.instance?.performGestureAction(action)
             action
         } else null
 
-        if (gestureName == "None") lastActioned = "None"
+        if (finalGesture == "None") lastActioned = "None"
 
         GestureEventBus.emit(
             GestureEventBus.GestureResult(
-                gestureName = gestureName,
-                confidence = confidence,
-                actionTriggered = triggered
+                gestureName     = finalGesture,
+                confidence      = finalConfidence,
+                actionTriggered = triggered,
+                landmarks       = lms
             )
         )
     }
