@@ -15,7 +15,7 @@ GestureControl is a sophisticated Android application designed for hands-free de
 
 | Home & Permissions | Test Mode | Action Mapping | Settings |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/home.png" width="200" /> | <img src="screenshots/test_mode.png" width="200" /> | <img src="screenshots/actions.png" width="200" /> | <img src="screenshots/settings.png" width="200" /> |
+| ![Home](./screenshots/home.jpeg) | ![Test Mode](./screenshots/test_mode.jpeg) | ![Action](./screenshots/action.jpeg) | ![Settings](./screenshots/settings.jpeg) |
 
 ## Gesture Mapping
 
