@@ -4,12 +4,14 @@ GestureControl is a sophisticated Android application designed for hands-free de
 
 ## Features
 
-- **Low-Latency Detection**: Powered by Google MediaPipe for responsive and accurate gesture tracking.
-- **Background Processing**: Runs as a foreground service to provide continuous detection across all applications.
-- **System Integration**: Injects touch events (taps, swipes) via Android's Accessibility Service.
-- **Visual Debugging**: Includes a "Test Mode" to visualize hand landmarks and detection confidence in real-time.
-- **Flexible Mapping**: Assign custom system actions to various hand gestures.
-- **User-Centric Design**: Modern, dark-themed interface built entirely with Jetpack Compose.
+- **High-Precision Hand Tracking**: Leverages Google MediaPipe to detect 21 unique hand landmarks with sub-millisecond latency.
+- **Universal Gesture Injection**: Seamlessly translates hand movements into system-wide touch events (Tap, Double Tap, Swipes) via Android Accessibility Services.
+- **Persistent Background Operation**: A robust Foreground Service ensures gesture detection remains active across all applications and even when the app is minimized.
+- **Advanced Action Mapping**: Fully customizable engine to assign specific system actions or navigation shortcuts to recognized gestures.
+- **Real-time Visualization**: Interactive "Test Mode" overlaying skeletal hand tracking and classification confidence for precise user feedback.
+- **Custom Gesture Framework**: Extensible support for custom TFLite models and a diverse built-in library of common hand gestures.
+- **Quick System Integration**: Dedicated Quick Settings Tile for rapid service toggling directly from the Android System UI.
+- **Modern Performance**: Sleek, dark-themed interface built entirely with Jetpack Compose for optimal responsiveness.
 
 ## Screenshots
 
