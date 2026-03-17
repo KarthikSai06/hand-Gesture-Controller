@@ -15,7 +15,7 @@ GestureControl is a sophisticated Android application designed for hands-free de
 
 | Home & Permissions | Test Mode | Action Mapping | Settings |
 | :---: | :---: | :---: | :---: |
-| ![Home](./screenshots/home.jpeg) | ![Test Mode](./screenshots/test_mode.jpeg) | ![Action](./screenshots/action.jpeg) | ![Settings](./screenshots/settings.jpeg) |
+| ![Home](https://github.com/KarthikSai06/hand-Gesture-Controller/blob/main/screenshots/home.jpeg?raw=true) | ![Test Mode](https://github.com/KarthikSai06/hand-Gesture-Controller/blob/main/screenshots/test_mode.jpeg?raw=true) | ![Action](https://github.com/KarthikSai06/hand-Gesture-Controller/blob/main/screenshots/action.jpeg?raw=true) | ![Settings](https://github.com/KarthikSai06/hand-Gesture-Controller/blob/main/screenshots/settings.jpeg?raw=true) |
 
 ## Gesture Mapping
 
@@ -50,7 +50,7 @@ The system follows a modular architecture to ensure performance and reliability:
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/YOUR_USERNAME/GestureControl.git
+    git clone https://github.com/KarthikSai06/hand-Gesture-Controller.git
     ```
 2.  **Add the ML Model**:
     - Download the `gesture_recognizer.task` file from the [Google MediaPipe Model Zoo](https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer#models).
