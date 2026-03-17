@@ -1,86 +1,69 @@
-# GestureControl Android App
+# GestureControl
 
-A professional Android app that uses the **front camera + Google MediaPipe** to recognize hand gestures and inject them as system-wide touch actions via Accessibility Services.
+GestureControl is a sophisticated Android application designed for hands-free device interaction through real-time hand gesture recognition. Utilizing on-device machine learning, the app translates physical gestures into system-wide navigation and touch events.
 
----
+## Features
 
-## 🚀 Quick Setup
+- **Low-Latency Detection**: Powered by Google MediaPipe for responsive and accurate gesture tracking.
+- **Background Processing**: Runs as a foreground service to provide continuous detection across all applications.
+- **System Integration**: Injects touch events (taps, swipes) via Android's Accessibility Service.
+- **Visual Debugging**: Includes a "Test Mode" to visualize hand landmarks and detection confidence in real-time.
+- **Flexible Mapping**: Assign custom system actions to various hand gestures.
+- **User-Centric Design**: Modern, dark-themed interface built entirely with Jetpack Compose.
 
-### Step 1 — Download the MediaPipe Model
+## Screenshots
 
-> [!IMPORTANT]
-> The model file is **not included** due to size. You must download it manually.
+| Home & Permissions | Test Mode | Action Mapping | Settings |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/home.png" width="200" /> | <img src="screenshots/test_mode.png" width="200" /> | <img src="screenshots/actions.png" width="200" /> | <img src="screenshots/settings.png" width="200" /> |
 
-1. Download from:  
-   `https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task`
-2. Place the file at:  
-   `app/src/main/assets/gesture_recognizer.task`  
-   *(create the `assets/` folder if it doesn't exist)*
+## Gesture Mapping
 
-### Step 2 — Open in Android Studio
+The application identifies several distinct gestures which can be mapped to system actions:
 
-1. Open **Android Studio** (Hedgehog 2023.1.1 or later recommended)
-2. **File → Open** → select the `GestureControl` folder
-3. Wait for Gradle sync to complete (downloads ~500 MB of dependencies on first run)
-4. **Build → Make Project** — should compile with 0 errors
+| Gesture | Default Action | Description |
+| :--- | :--- | :--- |
+| 👍 **Thumbs Up** | Double Tap | Simulates a double tap at the center of the screen. |
+| ☝️ **Pointing Up** | Swipe Up | Executes a vertical swipe from bottom to top. |
+| 🖐️ **Open Palm** | Custom | Configurable for various navigation tasks. |
+| 🤟 **ILoveYou** | Custom | Configurable for shortcut actions. |
 
-### Step 3 — Run on Device
+## Technical Architecture
 
-> **Physical device required** — The Accessibility Service and foreground camera don't work on emulators.
+The system follows a modular architecture to ensure performance and reliability:
 
-1. Enable **Developer Options** and **USB Debugging** on your Android device
-2. Run the app via Android Studio
-3. Grant **Camera** and **Notification** permissions when prompted
-4. Navigate to **Settings → Accessibility → Installed services → GestureControl** and enable it
-5. Return to the app — all permission cards should show ✅
+1.  **Input Layer (CameraX)**: Captures high-frequency frames from the front-facing camera.
+2.  **Processing Engine (MediaPipe)**: Analyzes frames on-device to detect 21 hand landmarks and classify gestures.
+3.  **Service Layer (Foreground Service)**: Manages the camera lifecycle and coordinates between recognition and execution.
+4.  **Execution Layer (Accessibility Service)**: Receives commands from the processing engine and dispatches `GestureDescription` strokes to the Android OS.
+5.  **Reactive UI (Jetpack Compose)**: Observes a central `SharedFlow` event bus to provide instantaneous feedback to the user.
 
----
+## Getting Started
 
-## 🎮 Gesture Actions
+### Prerequisites
 
-| Gesture | Action |
-|---|---|
-| 👍 Thumbs Up | Double Tap at screen center |
-| ☝️ Pointing Up | Swipe Up (full screen height) |
+- Android 9.0 (API 28) or higher.
+- Physical device with a front-facing camera.
+- Android Studio Hedgehog (2023.1.1)+.
 
----
+### Installation
 
-## 📱 App Screens
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/GestureControl.git
+    ```
+2.  **Add the ML Model**:
+    - Download the `gesture_recognizer.task` file from the [Google MediaPipe Model Zoo](https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer#models).
+    - Place the file in `app/src/main/assets/`.
+3.  **Build**: Open in Android Studio and sync Gradle.
 
-| Screen | Description |
-|---|---|
-| **Home** | Permission status, service toggle, gesture guide |
-| **Test** | Live camera preview + real-time gesture verification |
-| **Settings** | Toggle gestures, adjust confidence & cooldown |
+### Setup
 
----
+For the application to function, ensure the following are enabled:
+- **Camera Permission**: For image analysis.
+- **Notification Permission**: To keep the service active in the background.
+- **Accessibility Service**: Enable `GestureControl` in `System Settings > Accessibility`.
 
-## ⚙️ Architecture
+## License
 
-```
-Front Camera (CameraX)
-    → GestureRecognizerHelper (MediaPipe LIVE_STREAM)
-    → CameraForegroundService (maps gestures → actions)
-    → GestureAccessibilityService (dispatches system gestures)
-    → GestureEventBus (broadcasts to UI for real-time display)
-```
-
----
-
-## 📋 Requirements
-
-- Android 9.0+ (API 28)
-- Front-facing camera
-- Accessibility Service permission
-- Camera + Notification runtime permissions
-
----
-
-## 🔧 Troubleshooting
-
-| Problem | Solution |
-|---|---|
-| "Model not found" crash | Place `gesture_recognizer.task` in `app/src/main/assets/` |
-| Gestures not injecting | Enable Accessibility Service in Android Settings |
-| Camera black screen | Grant Camera permission; use physical device |
-| No notification | Grant Notification permission (Android 13+) |
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
